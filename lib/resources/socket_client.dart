@@ -8,7 +8,7 @@ class SocketClient{
   SocketClient._internal(){
     print('vlient');
     try{
-      socket = IO.io('http://192.168.1.9:3000', <String, dynamic>{
+      socket = IO.io('http://localhost:3000', <String, dynamic>{
         'transports': ['websocket'],
         'autoConnect': false,
       });

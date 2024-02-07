@@ -1,51 +1,23 @@
-var versionCode = "Alpha 0.9";
-
-//BOARDS IS AN ARRAY OF ARRAYS, WHERE EACH OF THE 9 ARRAYS REPRESENTS A LOCAL BOARD
-//var boards = [
-//    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-//    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-//    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-//    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-//    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-//    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-//    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-//    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-//    [0, 0, 0, 0, 0, 0, 0, 0, 0]
-//];
-//var mainBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-var currentTurn = 1;
+var checkWinCondition =require('./storage.js').checkWinCondition;
+//var versionCode = "Alpha 0.9";
+//var currentTurn = 1;
 var player = 1;
 var ai = -1;
 var currentBoard = 4;
-
-var gameRunning = false;
-
+//
+//var gameRunning = false;
+//
 var RUNS = 0;
-
+//
 var MOVES = 0;
-
-var switchAroo = 1;
-
-var AIACTIVE = true;
-
-var playerNames = ["PLAYER", "AI"];
+//
+//var switchAroo = 1;
+//
+//var AIACTIVE = true;
+//
+//var playerNames = ["PLAYER", "AI"];
 
 // ---------------------------------------------------------- FUNCTIONS ------------------------------------------------------------------------ //
-
-//SIMPLY CHECKS A NORMAL TIC TAC TOE BOARD, RETURNS 1 or -1 if a specific player has won, returns 0 if no one has won.
-function checkWinCondition(map) {
-    var a = 1;
-    if (map[0] + map[1] + map[2] === a * 3 || map[3] + map[4] + map[5] === a * 3 || map[6] + map[7] + map[8] === a * 3 || map[0] + map[3] + map[6] === a * 3 || map[1] + map[4] + map[7] === a * 3 ||
-        map[2] + map[5] + map[8] === a * 3 || map[0] + map[4] + map[8] === a * 3 || map[2] + map[4] + map[6] === a * 3) {
-        return a;
-    }
-    a = -1;
-    if (map[0] + map[1] + map[2] === a * 3 || map[3] + map[4] + map[5] === a * 3 || map[6] + map[7] + map[8] === a * 3 || map[0] + map[3] + map[6] === a * 3 || map[1] + map[4] + map[7] === a * 3 ||
-        map[2] + map[5] + map[8] === a * 3 || map[0] + map[4] + map[8] === a * 3 || map[2] + map[4] + map[6] === a * 3) {
-        return a;
-    }
-    return 0;
-}
 
 //The most important function, returns a numerical evaluation of the whole game in it's current state
 function evaluateGame(position, currentBoard) {
@@ -295,20 +267,14 @@ function sign(x){
     }
 }
 
-function playerTurn(boardToPlayOn){
-    var x=2;
-    boards[boardToPlayOn][x]=1;
-    currentBoard=x;
-}
 // ---------------------------------------------------------- GAME FUNCTION ------------------------------------------------------------------------ //
 
-var bestMove = -1;
-var bestScore = [-Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity];
+//var bestMove = -1;
+//var bestScore = [-Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity];
 
-function game(){
+function game(boards,mainBoard,currentBoard,MOVES){
     //AI HANDLER
-    if(currentTurn === -1 && gameRunning && AIACTIVE){
-        console.log("Start AI");
+//        console.log("Start AI");
         bestMove = -1;
         bestScore = [-Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity, -Infinity];
         RUNS = 0;
@@ -320,9 +286,10 @@ function game(){
                 boards[bt].forEach((v) => (v === 0 && count++));
             }
         }
+
         if(currentBoard === -1 || checkWinCondition(boards[currentBoard]) !== 0){
             var savedMm;
-            console.log("Remaining: " + count);
+//            console.log("Remaining: " + count);
 
             //This minimax doesn't actually play a move, it simply figures out which board you should play on
             if(MOVES < 10) {
@@ -333,13 +300,14 @@ function game(){
             }else{
                 savedMm = miniMax(boards, -1, Math.min(6, count), -Infinity, Infinity, true);
             }
-            console.log(savedMm.tP);
+//            console.log(savedMm.tP);
             currentBoard = savedMm.tP;
         }
-        console.log("......");
+//        console.log("......");
         //Just makes a quick default move for if all else fails
         for (var i = 0; i < 9; i++) {
-            if (boards[currentBoard][i] === 0) {
+            if (boards[currentBoard][i] == 0) {
+//                console.log(i);
                 bestMove = i;
                 break;
             }
@@ -349,10 +317,11 @@ function game(){
             //Best score is an array which contains individual scores for each square, here we're just changing them based on how good the move is on that one local board
             for (var a = 0; a < 9; a++) {
                 if (boards[currentBoard][a] === 0) {
-                    var score = evaluatePos(boards[currentBoard], a, currentTurn)*45;
+                    var score = evaluatePos(boards[currentBoard], a)*45;
                     bestScore[a] = score;
                 }
             }
+//            console.log(`${currentBoard}yoyo`);
             //And here we actually run minimax and add those values to the array
             for(var b = 0; b < 9; b++){
                 if(checkWinCondition(boards[currentBoard]) === 0){
@@ -363,118 +332,136 @@ function game(){
                         if(MOVES < 20){
                             savedMm = miniMax(boards, b, Math.min(5, count), -Infinity, Infinity, false);
                         }else if(MOVES < 32){
-                            console.log("DEEP SEARCH");
+//                            console.log("DEEP SEARCH");
                             savedMm = miniMax(boards, b, Math.min(6, count), -Infinity, Infinity, false);
                         }else{
-                            console.log("ULTRA DEEP SEARCH");
+//                            console.log("ULTRA DEEP SEARCH");
                             savedMm = miniMax(boards, b, Math.min(7, count), -Infinity, Infinity, false);
                         }
-                        console.log(savedMm);
+//                        console.log(savedMm);
                         var score2 = savedMm.mE;
                         boards[currentBoard][b] = 0;
                         bestScore[b] += score2;
                         //boardSel[b] = savedMm.tP;
-                        //console.log(score2);
+//                        console.log(score2);
                     }
                 }
             }
-            console.log(bestScore);
+//            console.log(`${bestScore} .....`);
             //Choses to play on the square with the highest evaluation in the bestScore array
-            for(var i in bestScore){
+            for(var i=0;i<9;i++){
                 if(bestScore[i] > bestScore[bestMove]){
                     bestMove = i;
                 }
             }
-            console.log(bestMove);
-            //Actually places the cross/nought
-            if(boards[currentBoard][bestMove] === 0){
-                boards[currentBoard][bestMove] = ai;
-                currentBoard = bestMove;
-            }
-            console.log(evaluateGame(boards, currentBoard));
         }
-
-        currentTurn = -currentTurn;
-
+        return {bestMove,currentBoard};
+}
+function setGame(boards,mainBoard,currentBoard,MOVES){
+    for(var i=0;i<9;i++){
+        for(var j=0;j<9;j++){
+            if(boards[i][j]=='X') boards[i][j]=1;
+            else if(boards[i][j]=='O') boards[i][j]=-1;
+            else boards[i][j]=0;
+        }
     }
+    for(var i=0;i<9;i++){
+        if(mainBoard[i][j]=='X') mainBoard[i][j]=1;
+        else if(mainBoard[i][j]=='O') mainBoard[i][j]=-1;
+        else mainBoard[i][j]=0;
+    }
+    return game(boards,mainBoard,currentBoard,MOVES);
+}
+module.exports = {
+  setGame,// Export the function
+};
+//console.log(`${game(boards,mainBoard,-1,7)}...........`);
+//            console.log(bestMove);
+//            //Actually places the cross/nought
+//            if(boards[currentBoard][bestMove] === 0){
+//                boards[currentBoard][bestMove] = ai;
+//                currentBoard = bestMove;
+//            }
+//            console.log(evaluateGame(boards, currentBoard));
+
+//        currentTurn = -currentTurn;
+
+//    }
     // console.log(',,,,,,')
-    for(var i in boards){
-        if(mainBoard[i] === 0) {
-            if (checkWinCondition(boards[i]) !== 0) {
-                mainBoard[i] = checkWinCondition(boards[i]);
-            }
-        }
-    }
-    console.log(gameRunning)
+//    for(var i in boards){
+//        if(mainBoard[i] === 0) {
+//            if (checkWinCondition(boards[i]) !== 0) {
+//                mainBoard[i] = checkWinCondition(boards[i]);
+//            }
+//        }
+//    }
+//    console.log(gameRunning)
     //Checks the win conditions
-    if(gameRunning){
-        if (checkWinCondition(mainBoard) !== 0) {
-            gameRunning = false;
-        }
-
-        //Once again, count the amount of playable squares, if it's 0, game is a tie
-        var countw = 0;
-        for(var bt = 0; bt < boards.length; bt++){
-            if(checkWinCondition(boards[bt]) === 0){
-                boards[bt].forEach((v) => (v === 0 && countw++));
-            }
-        }
-
-        if(countw === 0){
-            gameRunning = false;
-        }
-    }
+//    if(gameRunning){
+//        if (checkWinCondition(mainBoard) !== 0){
+//            gameRunning = false;
+//        }
+//        //Once again, count the amount of playable squares, if it's 0, game is a tie
+//        var countw = 0;
+//        for(var bt = 0; bt < boards.length; bt++){
+//            if(checkWinCondition(boards[bt]) === 0){
+//                boards[bt].forEach((v) => (v === 0 && countw++));
+//            }
+//        }
+//        if(countw === 0){
+//            gameRunning = false;
+//        }
+//    }
     // console.log(gameRunning)
-    if(mainBoard[currentBoard] !== 0 || !boards[currentBoard].includes(0)){currentBoard = -1;}
+//    if(mainBoard[currentBoard] !== 0 || !boards[currentBoard].includes(0)){currentBoard = -1;}
     // console.log(currentBoard)
-    playerTurn(currentBoard);
-    return "runs";
-}
-
-function startGame(type){
-    boards = [
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0]
-    ];
-
-    mainBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-
-    MOVES = 0;
-
-    //currentTurn = 1;
-    currentBoard = -1;
-
-    if(type === 0){
-        AIACTIVE = true;
-        gameRunning = true;
-        playerNames[0] = "PLAYER";
-        playerNames[1] = "AI";
-    }else{
-        AIACTIVE = false;
-        gameRunning = true;
-        switchAroo = 1;
-        playerNames[0] = "PLAYER 1";
-        playerNames[1] = "PLAYER 2";
-    }
-}
-
-function setGame(type){
-    if(type === 0){
-        currentTurn = 1;
-        switchAroo = 1;
-    }else{
-        currentTurn = -1;
-        switchAroo = -1;
-    }
-    startGame(0);
-}
+//    playerTurn(currentBoard);
+//}
+//
+//function startGame(type){
+//    boards = [
+//        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+//        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+//        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+//        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+//        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+//        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+//        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+//        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+//        [0, 0, 0, 0, 0, 0, 0, 0, 0]
+//    ];
+//
+//    mainBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+//
+//    MOVES = 0;
+//
+//    //currentTurn = 1;
+//    currentBoard = -1;
+//
+//    if(type === 0){
+//        AIACTIVE = true;
+//        gameRunning = true;
+//        playerNames[0] = "PLAYER";
+//        playerNames[1] = "AI";
+//    }else{
+//        AIACTIVE = false;
+//        gameRunning = true;
+//        switchAroo = 1;
+//        playerNames[0] = "PLAYER 1";
+//        playerNames[1] = "PLAYER 2";
+//    }
+//}
+//
+//function setGame(type){
+//    if(type === 0){
+//        currentTurn = 1;
+//        switchAroo = 1;
+//    }else{
+//        currentTurn = -1;
+//        switchAroo = -1;
+//    }
+//    startGame(0);
+//}
 
 //setGame(1);
 //game();

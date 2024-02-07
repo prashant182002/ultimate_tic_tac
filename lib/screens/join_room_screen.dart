@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tic_tac/resources/socket_methods.dart';
 
+import '../provider/room_data_provider.dart';
 import '../responsive/responsive.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_text.dart';
 import '../widgets/custom_textfield.dart';
+import 'game_screen.dart';
 
 class JoinRoomScreen extends StatefulWidget {
   static String routeName='/join-room';
@@ -18,16 +21,24 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
   final TextEditingController _gameIdController =TextEditingController();
   final TextEditingController _nameController =TextEditingController();
   final SocketMethods _socketMethods=SocketMethods();
+  var roomDataProvider;
+  var i=0;
   @override
 
   void initState(){
+    roomDataProvider = Provider.of<RoomDataProvider>(context,listen: false);
     super.initState();
-    _socketMethods.joinRoomSuccessListner(context);
-    _socketMethods.errorOccuredListner(context);
-    _socketMethods.updatePlayersStateListner(context);
+    _socketMethods.joinRoomSuccessListner(roomDataProvider,(){
+      if(i==1){
+        Navigator.pushNamed(context,GameScreen.routeName);
+      }
+    });
+    // _socketMethods.errorOccuredListner(context);
+    _socketMethods.updatePlayersStateListner(roomDataProvider);
   }
   void dispose(){
     super.dispose();
+    _socketMethods.disp();
     _gameIdController.dispose();
     _nameController.dispose();
   }
@@ -58,6 +69,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
                     print(_nameController.text);
                         _socketMethods.joinRoom(
                             _nameController.text, _gameIdController.text);
+                            i=1;
                       }, text: 'Join')
             ],
           ),

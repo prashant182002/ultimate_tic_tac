@@ -16,6 +16,7 @@ const roomSchema=new mongoose.Schema({
         type:Number,
         default:0,
     },
+    lastActivity: { type: Date, default: Date.now },
 });
 
 const roomModel=mongoose.model('Room',roomSchema);
